@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <link href="./lab.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body>
+    <!-- This is for the legend -->
+    <h2>
+      <div> <div style="position:absolute;bottom: 25%;left:2%;font-size: 16px;
+        font-family: sans-serif;font-style: normal;font-weight: normal; opacity: 0.7;">
+      <span></span>
+    </h2>
+
+    <!-- Actual code -->
+    <script type="text/javascript">
+
+        //Drawiing US Map
+
+        // Map dimensions
+        var w = 1280,
+            h = 800
+            opacityCircle = 0.7; // sets the opacity of the circles
+
+        // Projection setup
+        var projection = d3.geo.albers()
+            .rotate([96, 0])
+            .center([-.6, 38.7])
+            .parallels([29.5, 45.5])
+            .scale(900) // zoom on the map, circle stay same size, get alaska and hawaii at 400
+            .translate([w / 2 - 200, h / 2 - 100]);
+
+        // flight paths
+        // d3.geo.path is the primary mechanism for displaying geographic data
+        // generates the path string suitable for the "d" attribute of an SVG path element
+        var path = d3.geo.path()
+            // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
+            .projection(projection);
+
+        // constructs a feature generator for creating graticuls
+        // returns a multilinestring geometry object representing all meridians and parallels for this graticule
+
+        // Add an svg to the body of the page
+        var svg = d3.select("body").append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+        // Draw the map
+        // step through the topojoson
+        d3.json("us.json", function(error, us) {
+        if (error) throw error;
+
+        // insert all land masses and classify as land for css to work on
+        svg.insert("path")
+            .datum(topojson.feature(us, us.objects.land))
+            .attr("class", "land")
+            .attr("d", path);
+        
+        // drawing the state boundaries
+        svg.insert("path")
+            // edges shared by multiple states are stroked once
+            .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+            .attr("class", "state-boundary")
+            .attr("d", path);
+        });
+
+    </script>
+  </body>
+</html>
+
+
