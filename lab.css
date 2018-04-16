@@ -26,13 +26,6 @@ path.cell {
   pointer-events: all;
 }
 
-.graticule {
-  fill: none;
-  stroke: #777;
-  stroke-width: .001px;
-  stroke-opacity: .01;
-}
-
 .land {
   fill: none;
   stroke: lightgrey;

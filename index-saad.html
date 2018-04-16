@@ -37,9 +37,6 @@
             // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
             .projection(projection);
 
-        // constructs a feature generator for creating graticuls
-        // returns a multilinestring geometry object representing all meridians and parallels for this graticule
-
         // Add an svg to the body of the page
         var svg = d3.select("body").append("svg")
             .attr("width", w)
@@ -64,138 +61,102 @@
             .attr("d", path);
         });
 
-        // Defining locations
-        d3.select(self.frameElement).style("height", h + "px");
-
-        var states = svg.append("svg:g")
+        // Adding states, circles and cells object to a group element ("g") of the SVG
+        var states = svg.append("g")
             .attr("id", "states");
 
-        var circles = svg.append("svg:g")
+        var circles = svg.append("g")
             .attr("id", "circles");
 
-        var cells = svg.append("svg:g")
+        var cells = svg.append("g")
             .attr("id", "cells");
-
 
         // Load in flights data
         d3.csv("flights-airport_all.csv", function(flights) {
         
-        var linksByOrigin = {},
-            countByAirport = {},
-            cancelledByAirport = {},
-            locationByAirport = {},
-            Airport_count = {},
-            Cancelled_count = {},
-            Diverted_count = {},
-            arr_delay = {},
-            sec_delay = {},
-            weather_delay = {},
-            carrier_delay = {},
-            nas_delay = {},
-            late_aircraft_delay = {},
-            max_delay = {},
-            positions = [],
-
-            data_series_1 = {};
-
-
-        var arc = d3.geo.greatArc()
-            .source(function(d) { return locationByAirport[d.source]; })
-            .target(function(d) { return locationByAirport[d.target]; });
-
-
-        // assigning flight data to variables
-        flights.forEach(function(flight) {
-        var origin = flight.origin,
-            destination = flight.destination,
-            count_airport = +flight.count,
-
-            links = linksByOrigin[origin] || (linksByOrigin[origin] = []);
-            links.push({source: origin, target: destination});
-
-        // counting flights at airport location for circle size
-        countByAirport[origin] = (countByAirport[origin] || 0) + 5;
-        countByAirport[destination] = (countByAirport[destination] || 0) + 5;
-
-        // getting counts for flights, cancellations, diverted
-        Airport_count[origin] = (Airport_count[origin]|| 0)  + count_airport; 
-
-        });
+            var linksByOrigin = {},
+                countByAirport = {},
+                locationByAirport = {},
+                Airport_count = {},
+                positions = [];
             
-        // Load airport data
-        d3.csv("airports_2.csv", function(airports) {
+            // this will be used to create the lines between origin and destination airports
+            var arc = d3.geo.greatArc()
+                .source(function(d) { return locationByAirport[d.source]; })
+                .target(function(d) { return locationByAirport[d.target]; });
 
 
-            // Only consider airports with at least one flight.
-            airports = airports.filter(function(airport) {
-            if (countByAirport[airport.iata]) {
-                var location = [+airport.longitude, +airport.latitude];
-                locationByAirport[airport.iata] = location;
-                positions.push(projection(location)); 
-                return true;
-            }
+            // assigning flight data to variables
+            flights.forEach(function(flight) { // loop through every row of the csv
+                var origin = flight.origin, // grab the origin from the origin column of the csv
+                    destination = flight.destination, // grab the destination
+                    count_airport = +flight.count, // the plus converts .count to an integer
 
+                    // grab the links array associated with this origin, if none initialize empty array
+                    links = linksByOrigin[origin] || (linksByOrigin[origin] = []); 
+                    // add the current origin/destination link to the links array
+                    links.push({source: origin, target: destination});
+
+                // counting 5*number of links for each airport location to determine circle size
+                countByAirport[origin] = (countByAirport[origin] || 0) + 5;
+                countByAirport[destination] = (countByAirport[destination] || 0) + 5;
+
+                // getting counts for flights
+                Airport_count[origin] = (Airport_count[origin]|| 0)  + count_airport; 
             });
+                
+            // Load airport location data
+            d3.csv("airports_2.csv", function(airports) {
 
-            // Compute the Voronoi diagram of airports' projected positions.
-            var polygons = d3.geom.voronoi(positions);
-
-            var g = cells.selectAll("g")
-                .data(airports)
-            .enter().append("svg:g");
-
-
-            g.append("svg:path")
-                .attr("class", "cell")
-                .attr("d", function(d, i) { return "M" + polygons[i].join("L") + "Z"; })
-                .on("mouseover", function(d, i) { 
-
-
-                d3.select("h2 span").text("")
-                .append("p").text(d.name).style("font-size", "18px")
-                .append("p").text(d.city + ", " + d.state)
-                .append("p").text("Flights: " + Airport_count[d.iata]);
-
-
+                airports = airports.filter(function(airport) {
+                    if (countByAirport[airport.iata]) { // Only consider airports with at least one flight.
+                        var location = [+airport.longitude, +airport.latitude]; // grab the airport longitude and latitude as integers
+                        locationByAirport[airport.iata] = location; // store location of airport as key:value in object
+                        positions.push(projection(location)); // convert latitude and longitude to pixel x and y locations and save to array
+                        return true; // need to return true to the filter function to keep the airport
+                    }
                 });
 
+                // Compute the Voronoi diagram of airports' projected positions.
+                var polygons = d3.geom.voronoi(positions);
 
-                    g.selectAll("path.arc")
-                        .data(function(d) { return linksByOrigin[d.iata] || []; })
-                        .enter().append("svg:path")
-                        .attr("class", "arc")
-                        .attr("d", function(d) { return path(arc(d)); });
+                // add all the airports to the cells
+                var g = cells.selectAll("g")
+                    .data(airports)
+                    .enter()
+                    .append("g");
 
-                    circles.selectAll("circle")
-                        .data(airports)
-                        .enter().append("svg:circle")
-                        .attr("cx", function(d, i) { return positions[i][0]; })
-                        .attr("cy", function(d, i) { return positions[i][1]; })
-                        .attr("r", function(d, i) { return Math.sqrt(countByAirport[d.iata]); })
-                        .sort(function(a, b) { return countByAirport[b.iata] - countByAirport[a.iata]; })
-                        .attr("fill", "orange")
-                        .attr('opacity', opacityCircle);
+                g.append("path")
+                    .attr("class", "cell")
+                    .attr("d", function(d, i) { return "M" + polygons[i].join("L") + "Z"; })
+                    .on("mouseover", function(d, i) { 
 
 
-        // umbrella function to create bar chart
-        function dashboard(id, fData){
-
-            function histoGram(fD){
-
-                hG.update = function(nD, color){
-
-                }        
-            }
-
-        
-        }
+                    d3.select("h2 span").text("")
+                    .append("p").text(d.name).style("font-size", "18px")
+                    .append("p").text(d.city + ", " + d.state)
+                    .append("p").text("Flights: " + Airport_count[d.iata]);
 
 
-        dashboard('#dashboard',freqData);
+                    });
 
-        function updateBarChart(d, i) {
-                }
-        });
+
+                        g.selectAll("path.arc")
+                            .data(function(d) { return linksByOrigin[d.iata] || []; })
+                            .enter().append("svg:path")
+                            .attr("class", "arc")
+                            .attr("d", function(d) { return path(arc(d)); });
+
+                        circles.selectAll("circle")
+                            .data(airports)
+                            .enter().append("svg:circle")
+                            .attr("cx", function(d, i) { return positions[i][0]; })
+                            .attr("cy", function(d, i) { return positions[i][1]; })
+                            .attr("r", function(d, i) { return Math.sqrt(countByAirport[d.iata]); })
+                            .sort(function(a, b) { return countByAirport[b.iata] - countByAirport[a.iata]; })
+                            .attr("fill", "orange")
+                            .attr('opacity', opacityCircle);
+            });
         });
     </script>
   </body>
