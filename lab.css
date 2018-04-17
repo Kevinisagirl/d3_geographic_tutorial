@@ -9,11 +9,6 @@ h2 {
   opacity: 0.7
 }
 
-#states path {
-  fill: #ccc;
-  stroke: #fff;
-}
-
 path.arc {
   pointer-events: none;
   fill: none;

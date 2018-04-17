@@ -40,7 +40,7 @@
             // Draw the map
             // step through the topojoson
             d3.json("../us.json", function(error, us) {
-                if (error) throw error; // seems to be a convention in d3 examples to include this
+                if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
 
                 // insert all land masses and classify as land for css styling
                 svg.insert("path")

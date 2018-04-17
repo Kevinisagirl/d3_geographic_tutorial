@@ -1,17 +1,12 @@
 # d3_geographic_tutorial
 
-## Part 1: Drawing the map
+Fork this tutorial.
+cd d3_geographic_tutorial
 
-The land in this map has no fill. Change the color of the states.
-What happens if you change the color of the land border? What about the .state-boundaries border?
-Change the width of the borders.
-Adjust the zoom of the map.
-Have the map show counties instead of states.
+## Start server
 
-## Part 2: Changing out the Data
+Python2.6:
+python -m SimpleHTTPServer 8081
 
-Last week, we created a .csv with airport origins, destinations, and counts.
-Replace the flights-airport_all.csv with this csv in the code.
-
-Advanced:
-Change the radius of the circle to depend upon number of flights (counts) instead of "links".
+Python3:
+python3 -m http.server 8081
