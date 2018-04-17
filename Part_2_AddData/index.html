@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <link href="../lab.css" type="text/css" rel="stylesheet">
+  </head>
+
+    <body>
+        <!-- This is for the legend -->
+        <h2><span></span></h2>
+
+        <!-- Actual code -->
+        <script type="text/javascript">
+
+            //Drawiing US Map
+            // Map dimensions
+            var w = 1280,
+                h = 800
+                opacityCircle = 0.7; // sets the opacity of the circles
+
+            // Projection setup
+            var projection = d3.geo.albers()
+                .scale(900) // zoom on the map, see alaska and hawaii at 400
+                .translate([w / 2 - 200, h / 2 - 100]); // sets location of the map on the screen
+
+            // d3.geo.path is the primary mechanism for displaying geographic data
+            // generates the path string suitable for the "d" attribute of an SVG path element
+            var path = d3.geo.path()
+                // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
+                .projection(projection);
+
+            // Add an svg to the body of the page
+            var svg = d3.select("body").append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+            // Draw the map
+            // step through the topojoson
+            d3.json("../us.json", function(error, us) {
+                if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
+
+                // insert all land masses and classify as land for css to work on
+                svg.insert("path")
+                    .datum(topojson.feature(us, us.objects.land))
+                    .attr("class", "land")
+                    .attr("d", path);
+                
+                // drawing the state boundaries
+                svg.insert("path")
+                    // edges shared by multiple states are stroked once
+                    .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+                    .attr("class", "state-boundary")
+                    .attr("d", path);
+            });
+
+            // Adding states, circles and cells object to a group element ("g") of the SVG
+            var states = svg.append("g")
+                .attr("id", "states");
+
+            var circles = svg.append("g")
+                .attr("id", "circles");
+
+            var cells = svg.append("g") // will be used for Voronoi diagram
+                .attr("id", "cells");
+
+            // Load in flights data
+            d3.csv("../data/flights-airport_all.csv", function(flights) {
+            
+                var linksByOrigin = {}, // airport connections for drawing lines
+                    countByAirport = {}, // how many airport connections * 5 for calculating circle radius
+                    locationByAirport = {}, // longitude and latitude of airports
+                    Airport_count = {}, // how many flights out of an airport
+                    positions = []; // airport pixel x and y locations
+                
+                // this will be used to create the lines between origin and destination airports
+                var arc = d3.geo.greatArc()
+                    .source(function(d) { return locationByAirport[d.source]; })
+                    .target(function(d) { return locationByAirport[d.target]; });
+
+                // assigning flight data to variables
+                flights.forEach(function(flight) { // loop through every row of the csv
+                    var origin = flight.origin, // grab the origin from the origin column of the csv
+                        destination = flight.destination, // grab the destination
+                        count_airport = +flight.count, // the plus converts .count to an integer
+
+                        // grab the links array associated with this origin, if none initialize empty array
+                        links = linksByOrigin[origin] || (linksByOrigin[origin] = []); 
+                        // add the current origin/destination link to the links array
+                        links.push({source: origin, target: destination});
+
+                    // counting 5*number of links for each airport location to determine circle size
+                    countByAirport[origin] = (countByAirport[origin] || 0) + 5;
+                    countByAirport[destination] = (countByAirport[destination] || 0) + 5;
+
+                    // getting counts for flights
+                    Airport_count[origin] = (Airport_count[origin]|| 0)  + count_airport; 
+                });
+                    
+                // Load airport location data
+                d3.csv("../data/airports_2.csv", function(airports) {
+
+                    airports = airports.filter(function(airport) {
+                        if (countByAirport[airport.iata]) { // Only consider airports with at least one flight.
+                            var location = [+airport.longitude, +airport.latitude]; // grab the airport longitude and latitude as integers
+                            locationByAirport[airport.iata] = location; // store location of airport as key:value in object
+                            positions.push(projection(location)); // convert latitude and longitude to pixel x and y locations and save to array
+                            return true; // need to return true to the filter function to keep the airport
+                        }
+                    });
+        
+                    // Compute the Voronoi diagram of airports' projected positions.
+                    var polygons = d3.geom.voronoi(positions);
+
+                    // add all the airports to the cells
+                    var g = cells.selectAll("g")
+                        .data(airports)
+                        .enter()
+                        .append("g");
+
+                    g.append("path")
+                        .attr("class", "cell")
+                        .attr("d", function(d, i) { return "M" + polygons[i].join("L") + "Z"; })
+                        .on("mouseover", function(d, i) { 
+                            d3.select("h2 span").text("")
+                                .append("p").text(d.name).style("font-size", "18px")
+                                .append("p").text(d.city + ", " + d.state)
+                                .append("p").text("Flights: " + Airport_count[d.iata]);
+                        });
+                    g.selectAll("path.arc")
+                        .data(function(d) { return linksByOrigin[d.iata] || []; })
+                        .enter().append("svg:path")
+                        .attr("class", "arc")
+                        .attr("d", function(d) { return path(arc(d)); });
+
+                    circles.selectAll("circle")
+                        .data(airports)
+                        .enter().append("svg:circle")
+                        .attr("cx", function(d, i) { return positions[i][0]; })
+                        .attr("cy", function(d, i) { return positions[i][1]; })
+                        .attr("r", function(d, i) { return Math.sqrt(countByAirport[d.iata]); })
+                        .sort(function(a, b) { return countByAirport[b.iata] - countByAirport[a.iata]; })
+                        .attr("fill", "orange")
+                        .attr('opacity', opacityCircle);
+                });
+            });
+        </script>
+    </body>
+</html>
+
+

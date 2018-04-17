@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+        <link href="../lab.css" type="text/css" rel="stylesheet">
+    </head>
+
+    <body>
+        <!-- This is for the legend -->
+        <h2><span></span></h2>
+
+        <!-- Actual code -->
+        <script type="text/javascript">
+
+            //Drawiing US Map
+
+            // Map dimensions
+            var w = 1280,
+                h = 800;
+
+            // Projection setup
+            var projection = d3.geo.albers()
+                .scale(900) // zoom on the map, see alaska and hawaii at 400
+                .translate([w / 2 - 200, h / 2 - 100]); // sets location of the map on the screen
+
+            // d3.geo.path is the primary mechanism for displaying geographic data
+            // generates the path string suitable for the "d" attribute of an SVG path element
+            var path = d3.geo.path()
+                // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
+                .projection(projection);
+
+            // Add an svg to the body of the page
+            var svg = d3.select("body").append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+            // Draw the map
+            // step through the topojoson
+            d3.json("../us.json", function(error, us) {
+                if (error) throw error; // seems to be a convention in d3 examples to include this
+
+                // insert all land masses and classify as land for css styling
+                svg.insert("path")
+                    .datum(topojson.feature(us, us.objects.land))
+                    .attr("class", "land")
+                    .attr("d", path);
+                
+                // drawing the state boundaries
+                svg.insert("path")
+                    // edges shared by multiple states are stroked once
+                    .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+                    .attr("class", "state-boundary")
+                    .attr("d", path);
+            });
+        </script>
+    </body>
+</html>
+
+
+
+
+

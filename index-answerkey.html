@@ -74,7 +74,7 @@
 
 // HW SLN: replace the .csv here to use other data
         // Load in flights data
-        d3.csv("filteredflights.csv", function(flights) {
+        d3.csv("./data/filteredflights.csv", function(flights) {
         
             var linksByOrigin = {},
                 countByAirport = {},
@@ -108,7 +108,7 @@
             });
                 
             // Load airport location data
-            d3.csv("airports_2.csv", function(airports) {
+            d3.csv("./data/airports_2.csv", function(airports) {
 
                 airports = airports.filter(function(airport) {
                     if (countByAirport[airport.iata]) { // Only consider airports with at least one flight.
