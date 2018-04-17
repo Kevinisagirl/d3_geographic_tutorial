@@ -38,3 +38,11 @@ path.cell {
 #cells g:hover path.arc {
   display: inherit;
 }
+
+path {
+  fill: none;
+  /* stroke: black to see voronoi */
+  stroke:none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}

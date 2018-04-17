@@ -50,7 +50,8 @@
                 
                 // drawing the state boundaries
                 svg.insert("path")
-                    // edges shared by multiple states are stroked once
+                    // specifies only internal state borders should be drawn;
+                    // the coastlines are not stroked so as to retain detail around small islands and inlets
                     .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
                     .attr("class", "state-boundary")
                     .attr("d", path);
