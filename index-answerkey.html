@@ -20,7 +20,7 @@
         // Map dimensions
         var w = 1280,
             h = 800
-            opacityCircle = 0.7; // sets the opacity of the circles
+            opacityCircle = 0.25; // sets the opacity of the circles
 
         // Projection setup
         var projection = d3.geo.albers()
@@ -72,7 +72,7 @@
             .attr("id", "cells");
 
         // Load in flights data
-        d3.csv("flights-airport_all.csv", function(flights) {
+        d3.csv("filteredflights.csv", function(flights) {
         
             var linksByOrigin = {},
                 countByAirport = {},
@@ -88,8 +88,8 @@
 
             // assigning flight data to variables
             flights.forEach(function(flight) { // loop through every row of the csv
-                var origin = flight.origin, // grab the origin from the origin column of the csv
-                    destination = flight.destination, // grab the destination
+                var origin = flight.ORIGIN, // grab the origin from the origin column of the csv
+                    destination = flight.DEST, // grab the destination
                     count_airport = +flight.count, // the plus converts .count to an integer
 
                     // grab the links array associated with this origin, if none initialize empty array
@@ -116,7 +116,7 @@
                         return true; // need to return true to the filter function to keep the airport
                     }
                 });
-
+    
                 // Compute the Voronoi diagram of airports' projected positions.
                 var polygons = d3.geom.voronoi(positions);
 
@@ -149,6 +149,7 @@
                     .attr("r", function(d, i) { return Math.sqrt(countByAirport[d.iata]); })
                     .sort(function(a, b) { return countByAirport[b.iata] - countByAirport[a.iata]; })
                     .attr("fill", "orange")
+                    .attr("stroke", "black")
                     .attr('opacity', opacityCircle);
             });
         });

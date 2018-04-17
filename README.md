@@ -10,7 +10,7 @@ Have the map show counties instead of states.
 
 ## Part 2: Changing out the Data
 
-Last week, we created a .csv with airport origins, destinations, and counts. (We've include this csv... or maybe not.)
+Last week, we created a .csv with airport origins, destinations, and counts.
 Replace the flights-airport_all.csv with this csv in the code.
 
 Advanced:
