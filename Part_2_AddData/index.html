@@ -15,7 +15,7 @@
         <!-- Actual code -->
         <script type="text/javascript">
 
-            //Drawiing US Map
+            // Drawing US Map
             // Map dimensions
             var w = 1280,
                 h = 800
@@ -132,6 +132,7 @@
                         .enter()
                         .append("g");
 
+                    // Update "legend" with airport info on mouseover
                     g.append("path")
                         .attr("class", "cell")
                         .attr("d", function(d, i) { return "M" + polygons[i].join("L") + "Z"; })
@@ -141,6 +142,8 @@
                                 .append("p").text(d.city + ", " + d.state)
                                 .append("p").text("Flights: " + Airport_count[d.iata]);
                         });
+
+                    // Create arcs for all links originating out of selected airports
                     g.selectAll("path.arc")
                         .data(function(d) { return linksByOrigin[d.iata] || []; })
                         .enter()
@@ -148,6 +151,8 @@
                         .attr("class", "arc")
                         .attr("d", function(d) { return path(arc(d)); });
 
+
+                    // Create circles
                     circles.selectAll("circle")
                         .data(airports)
                         .enter()
