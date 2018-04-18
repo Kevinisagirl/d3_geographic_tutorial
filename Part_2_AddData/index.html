@@ -18,7 +18,7 @@
             // Drawing US Map
             // Map dimensions
             var w = 1280,
-                h = 800
+                h = 800,
                 opacityCircle = 0.7; // sets the opacity of the circles
 
             // Projection setup
@@ -31,36 +31,25 @@
             var path = d3.geo.path()
                 // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
                 .projection(projection);
-            
-            // returns a MultiLineString geometry object representing all meridians and parallels for this graticule
-            // needed to put topojson behind data circles
-            var graticule = d3.geo.graticule()
 
             // Add an svg to the body of the page
             var svg = d3.select("body").append("svg")
                 .attr("width", w)
                 .attr("height", h);
-            
-            // add the graticules to the SVG on the page
-            // needed to put topojson behind data circles
-            svg.append("path")
-                .datum(graticule)
-                .attr("class", "graticule")
-                .attr("d", path);
-    
+             
             // Draw the map
             // step through the topojoson
             d3.json("../us.json", function(error, us) {
                 if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
 
                 // insert all land masses and classify as land for css to work on
-                svg.insert("path", ".graticule")
+                svg.insert("path", "#states")
                     .datum(topojson.feature(us, us.objects.land))
                     .attr("class", "land")
                     .attr("d", path);
                 
                 // drawing the state boundaries
-                svg.insert("path", ".graticule")
+                svg.insert("path", "#states")
                     // specifies only internal state borders should be drawn;
                     // the coastlines are not stroked so as to retain detail around small islands and inlets
                     .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
