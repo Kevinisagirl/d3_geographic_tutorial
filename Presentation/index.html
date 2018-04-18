@@ -32,8 +32,7 @@
                 </section>
                 <section data-markdown>
                     <textarea data-template>
-                    We love D3 - but we can do so much more. 
-                    There is unlimited power. 
+                    Focus: Using D3 to visualize geographic data. 
                     </textarea>
                 </section>
                 <section>
@@ -45,19 +44,110 @@
                 </section>
                 <section>
                     <section data-background="green">
-                    <h2>TOPOJson</h2>
+                    <h2>PART 1: Understanding TOPOJson and the art of map-making</h2>
                     </section>
-                    <section>
+                    <section data-background="green">
                         A single TopoJSON file can contain multiple feature collections without duplication, such as states and counties.
                     </section>
-                    <section>
+                    <section data-background="green">
                         <img src="example.png">
                     </section>
                 </section>
-                <section data-markdown>
-                    <pre><code class="hljs" data-trim contenteditable>
-                        code
-                    </pre></code>
+                <section>
+                	The core components used to create a map of the US:
+                	<ul>
+                		<li> The projection used </li>
+                		<li> The SVG element </li>
+                		<li> Map boundaries </li>
+                	</ul>
+                </section>
+                <section>
+                    <section data-background="red">
+                    <h2>MAP PROJECTIONS</h2>
+                    </section>
+                    <section data-background="red">
+                        There are several different projections you can use to create maps. Here's a few from the TOPOJson package. 
+                    </section>
+                    <section data-background="red">
+                    	<h3>Mercator Projection</h3>
+                        <img src="mercator.png">
+                    </section >
+                    <section data-background="red">
+                    	<h3> Gnomonic Projection </h3>
+                        <img src="gnomoic.png">
+                    </section>
+                    <section data-background="red">
+                    	<h3> Albers USA Projection </h3>
+                        <img src="albers.png">
+                    </section>
+                    <section data-background="red">
+                    	<h3> Settting the projection </h3>
+	                    <pre><code class="hljs" data-trim contenteditable>
+// Map dimensions
+var w = 1280,
+h = 800;
+
+var projection = d3.geo.albers()
+	.scale(900) // zoom on the map
+	.translate([w / 2 - 200, h / 2 - 100]); // sets location of the map on the screen
+	                    </code></pre>
+                	</section>
+                	<section data-background="red">
+                		<h3> Place the projection on the screen </h3>
+                		<pre><code class="hljs" data-trim contenteditable>
+var path = d3.geo.path()
+     // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
+     .projection(projection);
+     					</code></pre>
+                	</section>
+                	<section data-background="red">
+                		<h3> Create the SVG Element </h3>
+                		<pre><code class="hljs" data-trim contenteditable>
+var svg = d3.select("body").append("svg")
+    .attr("width", w)
+    .attr("height", h);
+     					</code></pre>
+                	</section>
+                	<section data-background = 'red'>
+                		<h3> Drawing the actual map </h3>
+                		<pre><code class="hljs" data-trim contenteditable>
+d3.json("../us.json", function(error, us) {
+    if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
+	    // insert all land masses and classify as land for css styling
+	    svg.insert("path")
+	        .datum(topojson.feature(us, us.objects.land))
+	        .attr("class", "land")
+	        .attr("d", path);
+	    
+	    // drawing the state boundaries
+	    svg.insert("path")
+	        // specifies only internal state borders should be drawn;
+	        // the coastlines are not stroked so as to retain detail around small islands and inlets
+	        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+	        .attr("class", "state-boundary")
+	        .attr("d", path);
+     					</code></pre>
+                	</section>
+                	<section data-background="red">
+                		Add the CSS file and edit the different attributes of the map!
+                	</section>
+                </section>
+                <section>
+                    <h3>Exercise 1:</h3>
+                    We have added a lab.css file that you can edit to answer some of these questions.
+                    <p>
+                    <ol>
+	                    <li>The land in this map has no fill. Change the color of the states.</li>
+						<li>What happens if you change the color of the .state-boundaries border? What about the land border?</li>
+						<li>Change the width of the borders.</li>
+						<li>Adjust the zoom of the map.</li>
+						<li>Have the map show counties instead of only states.</li>
+					</ol>
+					</p>
+                </section>
+                <section data-background = 'orange'>
+                	<h3>PART 2: Utilizing data in D3 Geographic</h3>
+                	(...from your favorite dataset)
                 </section>
             </div>
         </div>
