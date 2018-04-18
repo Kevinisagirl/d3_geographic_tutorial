@@ -70,15 +70,15 @@
                     </section>
                     <section data-background="red">
                     	<h3>Mercator Projection</h3>
-                        <img src="mercator.png">
+                        <img src="mercator.PNG">
                     </section >
                     <section data-background="red">
                     	<h3> Gnomonic Projection </h3>
-                        <img src="gnomoic.png">
+                        <img src="gnomoic.PNG">
                     </section>
                     <section data-background="red">
                     	<h3> Albers USA Projection </h3>
-                        <img src="albers.png">
+                        <img src="albers.PNG">
                     </section>
                     <section data-background="red">
                     	<h3> Settting the projection </h3>
@@ -93,7 +93,7 @@ var projection = d3.geo.albers()
 	                    </code></pre>
                 	</section>
                 	<section data-background="red">
-                		<h3> Place the projection on the screen </h3>
+                		<h3> The geographic shape generator. This will be used to convert geometry into a form suitable for drawing on the screen based on our projection</h3>
                 		<pre><code class="hljs" data-trim contenteditable>
 var path = d3.geo.path()
      // takes the [longitude,latitude] pairs and converts to pixel position [x,y] on screen
@@ -109,7 +109,38 @@ var svg = d3.select("body").append("svg")
      					</code></pre>
                 	</section>
                 	<section data-background = 'red'>
-                		<h3> Drawing the actual map </h3>
+                        <h3> Drawing the actual map </h3>
+                        <h4> The "path" element is the most powerful element in the SVG library of basic shapes. You can use it to create lines, curves, arcs and more.</h4>
+                		<pre><code class="hljs" data-trim contenteditable>
+d3.json("../us.json", function(error, us) {
+    if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
+	    // insert all land masses and classify as land for css styling
+	    svg.insert("path")
+            .
+            .
+            .
+     					</code></pre>
+                    </section>
+                    <section data-background = 'red'>
+                        <h3> Drawing the actual map </h3>
+                        <h4> Load the land data (not yet drawn) and set the class for styling.</h4>
+                		<pre><code class="hljs" data-trim contenteditable>
+d3.json("../us.json", function(error, us) {
+    if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
+	    // insert all land masses and classify as land for css styling
+	    svg.insert("path")
+	        .datum(topojson.feature(us, us.objects.land))
+	        .attr("class", "land")
+            .
+            .
+            .
+     					</code></pre>
+                    </section>
+                    <section data-background = 'red'>
+                        <h3> Drawing the actual map </h3>
+                        <h4> The "d" attribute of a path contains the instructions for drawing. Here, we use our geographic shape generator (named path) to convert the 
+                            loaded data into drawing instructions.
+                        </h4>
                 		<pre><code class="hljs" data-trim contenteditable>
 d3.json("../us.json", function(error, us) {
     if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
@@ -118,16 +149,37 @@ d3.json("../us.json", function(error, us) {
 	        .datum(topojson.feature(us, us.objects.land))
 	        .attr("class", "land")
 	        .attr("d", path);
-	    
-	    // drawing the state boundaries
-	    svg.insert("path")
-	        // specifies only internal state borders should be drawn;
-	        // the coastlines are not stroked so as to retain detail around small islands and inlets
-	        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
-	        .attr("class", "state-boundary")
-	        .attr("d", path);
      					</code></pre>
-                	</section>
+                    </section>
+                    <section data-background="red">
+                            <h3> Drawing us.objects.land </h3>
+                            <img src="./land.PNG">
+                    </section>
+                    <section data-background = 'red'>
+                            <h3> Drawing the actual map </h3>
+                            <h4> Add the state boundaries.</h4>
+                            <pre><code class="hljs" data-trim contenteditable>
+    d3.json("../us.json", function(error, us) {
+        if (error) throw error; // seems to be a convention in d3 examples to include this, does nothing
+            // insert all land masses and classify as land for css styling
+            svg.insert("path")
+                .datum(topojson.feature(us, us.objects.land))
+                .attr("class", "land")
+                .attr("d", path);
+            
+            // drawing the state boundaries
+            svg.insert("path")
+                // specifies only internal state borders should be drawn;
+                // the coastlines are not stroked so as to retain detail around small islands and inlets
+                .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+                .attr("class", "state-boundary")
+                .attr("d", path);
+                             </code></pre>
+                    </section>
+                    <section data-background="red">
+                            <h3> Drawing us.objects.land </h3>
+                            <img src="./Part1.PNG">
+                    </section>
                 	<section data-background="red">
                 		Add the CSS file and edit the different attributes of the map!
                 	</section>
