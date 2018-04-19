@@ -359,6 +359,11 @@ d3.json("../us.json", function(error, us) {
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
                                 <h4> Adding a Voronoi layout </h4>
+                                <img src="./Voronoi.PNG">
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding a Voronoi layout </h4>
                                 <pre><code class="hljs" data-trim contenteditable>
                                         // Load in flights data
                                         d3.csv("../data/flights-airport_all.csv", function(flights) {
@@ -371,13 +376,19 @@ d3.json("../us.json", function(error, us) {
                                                 ...
                                     
                                                 // Compute the Voronoi diagram of airports' projected positions.
-                                                var polygons = d3.geom.voronoi(positions);                   
+                                                var polygons = d3.geom.voronoi(positions);    
+                                                
+                                                // add all the airports to the cells
+                                                var g = cells.selectAll("g")
+                                                    .data(airports)
+                                                    .enter()
+                                                    .append("g");  
                                 </code></pre>
                         </section>
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
                                 <h4> Adding a Voronoi layout </h4>
-                                
+                                <img src="./cells_g.PNG">
                         </section>
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
@@ -391,17 +402,34 @@ d3.json("../us.json", function(error, us) {
                                             // Load airport location data
                                             d3.csv("../data/airports_2.csv", function(airports) {
                             
-                                                ...
-                                    
-                                                // Compute the Voronoi diagram of airports' projected positions.
-                                                var polygons = d3.geom.voronoi(positions);
+                                                ...                          
+                                                                    
+                                                // Update "legend" with airport info on mouseover
+                                                g.append("path")
+                                                    .attr("class", "cell")
+                                                    .attr("d", function(d, i) { return "M" + polygons[i].join("L") + "Z"; })                                                           
+                                </code></pre>
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding a Voronoi layout </h4>
+                                <img src="./cells_d.PNG">
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding a Voronoi layout </h4>
+                                <h4> Adding mouseover functionality </h4>
+                                <pre><code class="hljs" data-trim contenteditable>
+                                        // Load in flights data
+                                        d3.csv("../data/flights-airport_all.csv", function(flights) {
+                                        
+                                            ...
+                                                
+                                            // Load airport location data
+                                            d3.csv("../data/airports_2.csv", function(airports) {
                             
-                                                // add all the airports to the cells
-                                                var g = cells.selectAll("g")
-                                                    .data(airports)
-                                                    .enter()
-                                                    .append("g");
-                            
+                                                ...                          
+                                                                    
                                                 // Update "legend" with airport info on mouseover
                                                 g.append("path")
                                                     .attr("class", "cell")
@@ -411,7 +439,34 @@ d3.json("../us.json", function(error, us) {
                                                             .append("p").text(d.name).style("font-size", "18px")
                                                             .append("p").text(d.city + ", " + d.state)
                                                             .append("p").text("Flights: " + Airport_count[d.iata]);
-                                                    });
+                                                    });                                                              
+                                </code></pre>
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding a Voronoi layout </h4>
+                                <h4> Paragraphs not appended to h2 span until a mouseover event </h4>
+                                <img src="./mouseover.PNG">
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding a Voronoi layout </h4>
+                                <h4> Paragraphs not appended to h2 span until a mouseover event </h4>
+                                <img src="./withmouseover.PNG">
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding connections between airports </h4>
+                                <pre><code class="hljs" data-trim contenteditable>
+                                        // Load in flights data
+                                        d3.csv("../data/flights-airport_all.csv", function(flights) {
+                                        
+                                            ...
+                                                
+                                            // Load airport location data
+                                            d3.csv("../data/airports_2.csv", function(airports) {
+                            
+                                                ...                                                                                       
                             
                                                 // Create arcs for all links originating out of selected airports
                                                 g.selectAll("path.arc")
@@ -419,8 +474,47 @@ d3.json("../us.json", function(error, us) {
                                                     .enter()
                                                     .append("path")
                                                     .attr("class", "arc")
-                                                    .attr("d", function(d) { return path(arc(d)); });
+                                                    .attr("d", function(d) { return path(arc(d)); });                                    
+                                </code></pre>
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Adding connections between airports </h4>
+                                <img src="./allarcs.PNG">
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <h4> Hiding connections until mouseover </h4>
+                                <pre><code class="hljs" data-trim contenteditable>
+                                        path.arc {
+                                            pointer-events: none;
+                                            fill: none;
+                                            stroke: #000;
+                                            display: none;
+                                          }
+                                          
+                                          path.cell {
+                                            fill: none;
+                                            pointer-events: all;
+                                          }
+                                          
+                                          #cells g:hover path.arc {
+                                            display: inherit;
+                                          }                                    
+                                </code></pre>
+                        </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <pre><code class="hljs" data-trim contenteditable>
+                                        // Load in flights data
+                                        d3.csv("../data/flights-airport_all.csv", function(flights) {
+                                        
+                                            ...
+                                                
+                                            // Load airport location data
+                                            d3.csv("../data/airports_2.csv", function(airports) {
                             
+                                                ...                                                                                                                  
                             
                                                 // Create circles
                                                 circles.selectAll("circle")
@@ -437,6 +531,22 @@ d3.json("../us.json", function(error, us) {
                                         });                                    
                                 </code></pre>
                         </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <img src="./circles.PNG">
+                        </section>
+                        <section>
+                                <h3>Exercise 2:</h3>
+                                Last week, we created a .csv with airport origins, destinations, and counts. This file required some cleaning to remove US airports not within the states. We have provided you with the resulting .csv, "filteredflights.csv".
+                                <p>
+                                <ol>
+                                    <li>Replace the current data with this csv in the code.</li>
+                                    <li>The circles are now hard to discern due to the overlap. Adjust the circle features to better show individual airports.</li>
+                                    <li>Change the radius of the circle to depend upon number of flights (counts) instead of "links".</li>
+                                    <li>Adjust how the radius is calculated from the counts for better scaled circles.</li>
+                                </ol>
+                                </p>
+                            </section>
                 </section>
                 
             </div>
