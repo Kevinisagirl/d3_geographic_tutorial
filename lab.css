@@ -21,6 +21,10 @@ path.cell {
   pointer-events: all;
 }
 
+#cells g:hover path.arc {
+  display: inherit;
+}
+
 .land {
   fill: none;
   stroke: lightgrey;
@@ -35,13 +39,9 @@ path.cell {
   stroke: brown;
 }
 
-#cells g:hover path.arc {
-  display: inherit;
-}
-
 path {
   fill: none;
-  stroke: red;
+  stroke: none;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
