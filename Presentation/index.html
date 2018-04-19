@@ -290,6 +290,7 @@ d3.json("../us.json", function(error, us) {
                         </section>
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
+                                <h4>Instantiating some variables</h4>
                                 <pre><code class="hljs" data-trim contenteditable>
                                         // Load in flights data
                                         d3.csv("../data/flights-airport_all.csv", function(flights) {
@@ -308,30 +309,31 @@ d3.json("../us.json", function(error, us) {
                         </section>
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
+                                <h4>Load in some D.C. flights data</h4>
                                 <pre><code class="hljs" data-trim contenteditable>
-                                        // Load in flights data
-                                        d3.csv("../data/flights-airport_all.csv", function(flights) {
+                                    // Load in flights data
+                                    d3.csv("../data/flights-airport_all.csv", function(flights) {
+
+                                        ...
                                         
-                                            ...
-                            
-                                            // assigning flight data to variables
-                                            flights.forEach(function(flight) { // loop through every row of the csv
-                                                var origin = flight.origin, // grab the origin
-                                                    destination = flight.destination, // grab the destination
-                                                    count_airport = +flight.count, // the plus converts .count to an integer
-                            
-                                                    // grab the links array associated with this origin, if none initialize empty array
-                                                    links = linksByOrigin[origin] || (linksByOrigin[origin] = []); 
-                                                    // add the current origin/destination link to the links array
-                                                    links.push({source: origin, target: destination});
-                            
-                                                // counting 5*number of links for each airport location to determine circle size
-                                                countByAirport[origin] = (countByAirport[origin] || 0) + 5;
-                                                countByAirport[destination] = (countByAirport[destination] || 0) + 5;
-                            
-                                                // getting counts for flights
-                                                Airport_count[origin] = (Airport_count[origin]|| 0)  + count_airport; 
-                                            });                                  
+                                        // assigning flight data to variables
+                                        flights.forEach(function(flight) { // loop through every row of the csv
+                                            var origin = flight.origin, // grab the origin
+                                                destination = flight.destination, // grab the destination
+                                                count_airport = +flight.count, // the plus converts .count to an integer
+
+                                                // grab the links array associated with this origin, if none initialize empty array
+                                                links = linksByOrigin[origin] || (linksByOrigin[origin] = []); 
+                                                // add the current origin/destination link to the links array
+                                                links.push({source: origin, target: destination});
+
+                                            // counting 5*number of links for each airport location to determine circle size
+                                            countByAirport[origin] = (countByAirport[origin] || 0) + 5;
+                                            countByAirport[destination] = (countByAirport[destination] || 0) + 5;
+
+                                            // getting counts for flights
+                                            Airport_count[origin] = (Airport_count[origin]|| 0)  + count_airport; 
+                                        });                                  
                                 </code></pre>
                         </section>
                         <section data-background="orange">
@@ -418,7 +420,7 @@ d3.json("../us.json", function(error, us) {
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
                                 <h4> Adding a Voronoi layout </h4>
-                                <h4> Adding mouseover functionality </h4>
+                                <h5> Adding mouseover functionality </h5>
                                 <pre><code class="hljs" data-trim contenteditable>
                                         // Load in flights data
                                         d3.csv("../data/flights-airport_all.csv", function(flights) {
@@ -445,13 +447,13 @@ d3.json("../us.json", function(error, us) {
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
                                 <h4> Adding a Voronoi layout </h4>
-                                <h4> Paragraphs not appended to h2 span until a mouseover event </h4>
+                                <h5> Paragraphs not appended to h2 span until a mouseover event </h5>
                                 <img src="./mouseover.PNG">
                         </section>
                         <section data-background="orange">
                                 <h3> Adding our Data</h3>
                                 <h4> Adding a Voronoi layout </h4>
-                                <h4> Paragraphs not appended to h2 span until a mouseover event </h4>
+                                <h5> Paragraphs not appended to h2 span until a mouseover event </h5>
                                 <img src="./withmouseover.PNG">
                         </section>
                         <section data-background="orange">
@@ -493,14 +495,14 @@ d3.json("../us.json", function(error, us) {
                                             display: none;
                                           }
                                           
-                                          path.cell {
-                                            fill: none;
-                                            pointer-events: all;
-                                          }
+                                        path.cell {
+                                        fill: none;
+                                        pointer-events: all;
+                                        }
                                           
-                                          #cells g:hover path.arc {
-                                            display: inherit;
-                                          }                                    
+                                        #cells g:hover path.arc {
+                                        display: inherit;
+                                        }                                    
                                 </code></pre>
                         </section>
                         <section data-background="orange">
@@ -535,20 +537,23 @@ d3.json("../us.json", function(error, us) {
                                 <h3> Adding our Data</h3>
                                 <img src="./circles.PNG">
                         </section>
-                        <section>
-                                <h3>Exercise 2:</h3>
-                                Last week, we created a .csv with airport origins, destinations, and counts. This file required some cleaning to remove US airports not within the states. We have provided you with the resulting .csv, "filteredflights.csv".
-                                <p>
-                                <ol>
-                                    <li>Replace the current data with this csv in the code.</li>
-                                    <li>The circles are now hard to discern due to the overlap. Adjust the circle features to better show individual airports.</li>
-                                    <li>Change the radius of the circle to depend upon number of flights (counts) instead of "links".</li>
-                                    <li>Adjust how the radius is calculated from the counts for better scaled circles.</li>
-                                </ol>
-                                </p>
-                            </section>
+                        <section data-background="orange">
+                                <h3> Adding our Data</h3>
+                                <img src="./Final.png">
+                        </section>
                 </section>
-                
+                <section>
+                    <h3>Exercise 2:</h3>
+                    Last week, we created a .csv with airport origins, destinations, and counts. This file required some cleaning to remove US airports not within the states. We have provided you with the resulting .csv, "filteredflights.csv".
+                    <p>
+                    <ol>
+                        <li>Replace the current data with this csv in the code.</li>
+                        <li>The circles are now hard to discern due to the overlap. Adjust the circle features to better show individual airports.</li>
+                        <li>Change the radius of the circle to depend upon number of flights (counts) instead of "links".</li>
+                        <li>Adjust how the radius is calculated from the counts for better scaled circles.</li>
+                    </ol>
+                    </p>
+                </section>                
             </div>
         </div>
 
